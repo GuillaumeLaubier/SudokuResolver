@@ -16,10 +16,21 @@ func main() {
   displayGrid(grid)
 
   fmt.Println(isSquareValid(grid, 0, 0))
-  fmt.Println(isRowValid(grid, 4, 4))
-  fmt.Println(isColumnValid(grid, 2, 4))
+  fmt.Println(isRowValid(grid, 4))
+  fmt.Println(isColumnValid(grid, 2))
+  fmt.Println(isGridValid(grid))
+  fmt.Println(isSudokuFinished(grid))
 }
 
+/*
+ * Resolve section
+ */
+
+
+
+/*
+ * Display section
+ */
 
 func displayGrid(sudokuGrid SudokuGrid) {
   fmt.Println("-------------------------------")
@@ -55,6 +66,38 @@ func prettyDisplay(i int) string {
  * Check section
  */
 
+func isSudokuFinished(sudokuGrid SudokuGrid) bool {
+  emptyCaseLeft := false
+
+  for x := 0; x < 9; x++ {
+    for y := 0; y < 9; y++ {
+      if (sudokuGrid.grid[x][y] == 0) {
+        emptyCaseLeft = true
+      }
+    }
+  }
+
+  return !emptyCaseLeft && isGridValid(sudokuGrid)
+}
+
+func isGridValid(sudokuGrid SudokuGrid) bool {
+  for x := 0; x < 3; x++ {
+    for y := 0; y < 3; y++ {
+      if !isSquareValid(sudokuGrid, x, y) {
+        return false
+      }
+    }
+  }
+
+  for idx := 0; idx < 9; idx++ {
+    if !isRowValid(sudokuGrid, idx) || !isColumnValid(sudokuGrid, idx) {
+      return false
+    }
+  }
+
+  return true
+}
+
 func isSubGridValid(subGrid [9]int) bool {
   cptValue := [9]int{}
 
@@ -89,8 +132,8 @@ func isSquareValid(sudokuGrid SudokuGrid, x int, y int) bool {
   return isSubGridValid(subGrid)
 }
 
-func isRowValid(sudokuGrid SudokuGrid, x int, y int) bool {
-  if x >= 9 || y >= 9 {
+func isRowValid(sudokuGrid SudokuGrid, y int) bool {
+  if y >= 9 {
     return false
   }
 
@@ -100,13 +143,11 @@ func isRowValid(sudokuGrid SudokuGrid, x int, y int) bool {
     subGrid[idx] = sudokuGrid.grid[idx][y]
   }
 
-  fmt.Println(subGrid)
-
   return isSubGridValid(subGrid)
 }
 
-func isColumnValid(sudokuGrid SudokuGrid, x int, y int) bool {
-  if x >= 9 || y >= 9 {
+func isColumnValid(sudokuGrid SudokuGrid, x int) bool {
+  if x >= 9 {
     return false
   }
 
@@ -115,8 +156,6 @@ func isColumnValid(sudokuGrid SudokuGrid, x int, y int) bool {
   for idx := 0; idx < 9; idx++ {
     subGrid[idx] = sudokuGrid.grid[x][idx]
   }
-
-  fmt.Println(subGrid)
 
   return isSubGridValid(subGrid)
 }
