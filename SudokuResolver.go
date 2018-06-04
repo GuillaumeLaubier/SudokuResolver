@@ -26,7 +26,9 @@ func main() {
  * Resolve section
  */
 
-
+func resolveSudoku(sudokuGrid SudokuGrid) SudokuGrid {
+  
+}
 
 /*
  * Display section
