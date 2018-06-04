@@ -14,20 +14,29 @@ func main() {
 
   grid := SudokuGrid{grid: easy}
   displayGrid(grid)
+
+  fmt.Println(isSquareValid(grid, 0, 0))
 }
 
 
 func displayGrid(sudokuGrid SudokuGrid) {
-  fmt.Println("-------------------------")
+  fmt.Println("-------------------------------")
 
-  for y := 0; y < 9; y += 3 {
-    for x := 0; x < 9; x += 3 {
-      fmt.Println("|", prettyDisplay(sudokuGrid.grid[x][y]), prettyDisplay(sudokuGrid.grid[x + 1][y]), prettyDisplay(sudokuGrid.grid[x + 2][y]),
-        "|", prettyDisplay(sudokuGrid.grid[x][y + 1]), prettyDisplay(sudokuGrid.grid[x + 1][y + 1]), prettyDisplay(sudokuGrid.grid[x + 2][y + 1]),
-        "|", prettyDisplay(sudokuGrid.grid[x][y + 2]), prettyDisplay(sudokuGrid.grid[x + 1][y + 2]), prettyDisplay(sudokuGrid.grid[x + 2][y + 2]), "|")
+  for y := 0; y < 9; y++ {
+    fmt.Print("|")
+
+    for x := 0; x < 9; x++ {
+      fmt.Print(" ", prettyDisplay(sudokuGrid.grid[x][y]), " ")
+
+      if (x + 1) % 3 == 0 {
+        fmt.Print("|")
+      }
     }
+    fmt.Println("")
 
-    fmt.Println("-------------------------")
+    if (y + 1) % 3 == 0 {
+      fmt.Println("-------------------------------")
+    }
   }
 }
 
