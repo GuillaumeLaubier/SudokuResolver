@@ -13,13 +13,13 @@ func main() {
 
 
 func displayGrid(sudokuGrid SudokuGrid) {
-  fmt.Println("--------------------------")
+  fmt.Println("-------------------------")
 
   for i := 0; i < 9; i += 3 {
     for j := 0; j < 9; j += 3 {
       fmt.Println("|", sudokuGrid.grid[i][j], sudokuGrid.grid[i][j + 2], sudokuGrid.grid[i][j + 2], "|", sudokuGrid.grid[i + 1][j], sudokuGrid.grid[i + 1][j + 2], sudokuGrid.grid[i + 1][j + 2], "|", sudokuGrid.grid[i + 2][j], sudokuGrid.grid[i + 2][j + 2], sudokuGrid.grid[i + 2][j + 2], "|")
     }
-    
-    fmt.Println("--------------------------")
+
+    fmt.Println("-------------------------")
   }
 }
