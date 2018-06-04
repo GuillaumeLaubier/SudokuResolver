@@ -16,6 +16,8 @@ func main() {
   displayGrid(grid)
 
   fmt.Println(isSquareValid(grid, 0, 0))
+  fmt.Println(isRowValid(grid, 4, 4))
+  fmt.Println(isColumnValid(grid, 2, 4))
 }
 
 
@@ -58,9 +60,9 @@ func isSubGridValid(subGrid [9]int) bool {
 
   for i := 0; i < 9; i++ {
     if subGrid[i] != 0 {
-      cptValue[i - 1]++
+      cptValue[subGrid[i] - 1]++
 
-      if cptValue[i - 1] > 1 {
+      if cptValue[subGrid[i] - 1] > 1 {
         return false
       }
     }
@@ -88,17 +90,33 @@ func isSquareValid(sudokuGrid SudokuGrid, x int, y int) bool {
 }
 
 func isRowValid(sudokuGrid SudokuGrid, x int, y int) bool {
-  return isSubGridValid(getRowForIndex(sudokuGrid, x, y))
-}
+  if x >= 9 || y >= 9 {
+    return false
+  }
 
-func getRowForIndex(sudokuGrid SudokuGrid, x int, y int) [9]int {
-  return [9]int{}
+  subGrid := [9]int{}
+
+  for idx := 0; idx < 9; idx++ {
+    subGrid[idx] = sudokuGrid.grid[idx][y]
+  }
+
+  fmt.Println(subGrid)
+
+  return isSubGridValid(subGrid)
 }
 
 func isColumnValid(sudokuGrid SudokuGrid, x int, y int) bool {
- return false
-}
+  if x >= 9 || y >= 9 {
+    return false
+  }
 
-func getColumnForIndex(sudokuGrid SudokuGrid, x int, y int) [9]int {
-  return [9]int{}
+  subGrid := [9]int{}
+
+  for idx := 0; idx < 9; idx++ {
+    subGrid[idx] = sudokuGrid.grid[x][idx]
+  }
+
+  fmt.Println(subGrid)
+
+  return isSubGridValid(subGrid)
 }
