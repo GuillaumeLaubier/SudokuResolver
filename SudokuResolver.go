@@ -10,7 +10,7 @@ type SudokuGrid struct {
 }
 
 func main() {
-  easy := [9][9]int{[9]int{0, 4, 6, 0, 2, 3, 0, 7, 9}, [9]int{2, 5, 8, 0, 7, 9, 4, 6, 3}, [9]int{0, 7, 9, 5, 4, 6, 0, 1, 8}, [9]int{4, 0, 2, 3, 0, 5, 6, 0, 7}, [9]int{5, 8, 3, 6, 9, 7, 1, 4, 2}, [9]int{6, 0, 7, 2, 0, 4, 8, 0, 5}, [9]int{7, 2, 0, 9, 6, 8, 3, 5, 0}, [9]int{8, 3, 4, 7, 5, 0, 9, 2, 6}, [9]int{9, 6, 0, 4, 3, 0, 7, 8, 0}}
+  easy := [9][9]int{[9]int{0, 0, 4, 0, 9, 0, 8, 0, 0}, [9]int{7, 0, 9, 1, 0, 0, 0, 0, 0}, [9]int{1, 0, 0, 0, 2, 0, 5, 0, 7}, [9]int{0, 3, 0, 9, 0, 0, 0, 6, 0}, [9]int{9, 0, 0, 0, 0, 0, 0, 0, 4}, [9]int{0, 6, 0, 0, 0, 8, 0, 7, 0}, [9]int{8, 0, 7, 0, 6, 0, 0, 0, 3}, [9]int{0, 0, 0, 0, 0, 2, 7, 0, 5}, [9]int{0, 0, 5, 0, 3, 0, 6, 0, 0}}
 
   grid := SudokuGrid{grid: easy}
   displayGrid(grid)
@@ -20,14 +20,52 @@ func main() {
   fmt.Println(isColumnValid(grid, 2))
   fmt.Println(isGridValid(grid))
   fmt.Println(isSudokuFinished(grid))
+
+  isResolved, resolvedGrid := resolveSudoku(grid)
+  fmt.Println("Is resolved:", isResolved)
+  displayGrid(resolvedGrid)
 }
 
 /*
  * Resolve section
  */
 
-func resolveSudoku(sudokuGrid SudokuGrid) SudokuGrid {
-  
+func resolveSudoku(sudokuGrid SudokuGrid) (bool, SudokuGrid) {
+  x, y := nextEmptyIndex(sudokuGrid)
+  return putValue(1, sudokuGrid, x, y)
+}
+
+func putValue(value int, sudokuGrid SudokuGrid, x int, y int) (bool, SudokuGrid) {
+  if value > 9 {
+    return false, sudokuGrid
+  }
+
+  if x == -1 && y == -1 {
+    return true, sudokuGrid
+  }
+
+  sudokuGrid.grid[x][y] = value
+  if isGridValid(sudokuGrid) {
+    nextX, nextY := nextEmptyIndex(sudokuGrid)
+    return putValue(1, sudokuGrid, nextX, nextY)
+  } else {
+    return putValue(value + 1, sudokuGrid, x, y)
+  }
+}
+
+
+
+func nextEmptyIndex(sudokuGrid SudokuGrid) (int, int) {
+  for idxX := 0; idxX < 9; idxX++ {
+    for idxY := 0; idxY < 9; idxY++ {
+      if sudokuGrid.grid[idxX][idxY] == 0 {
+        return idxX, idxY
+      }
+    }
+  }
+
+  // There is no more empty index
+  return -1, -1
 }
 
 /*
