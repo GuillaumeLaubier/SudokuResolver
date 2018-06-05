@@ -3,6 +3,7 @@ package main
 import (
   "fmt"
   "strconv"
+  "time"
 )
 
 type SudokuGrid struct {
@@ -16,8 +17,15 @@ func main() {
   grid := SudokuGrid{grid: hard}
   displayGrid(grid)
 
+  start := time.Now()
+
   isResolved, resolvedGrid := resolveSudoku(grid)
+
+  elapsed := time.Since(start)
+
   fmt.Println("Is resolved:", isResolved)
+  fmt.Printf("Took %s\n", elapsed)
+
   displayGrid(resolvedGrid)
 }
 
@@ -26,7 +34,7 @@ func main() {
  */
 
 func resolveSudoku(sudokuGrid SudokuGrid) (bool, SudokuGrid) {
-  x, y := nextEmptyIndex(sudokuGrid)
+  x, y := nextEmptyIndexByRow(sudokuGrid)
   return putValue(1, sudokuGrid, x, y)
 }
 
@@ -42,7 +50,7 @@ func putValue(value int, sudokuGrid SudokuGrid, x int, y int) (bool, SudokuGrid)
   sudokuGrid.grid[x][y] = value
 
   if isGridValid(sudokuGrid) {
-    nextX, nextY := nextEmptyIndex(sudokuGrid)
+    nextX, nextY := nextEmptyIndexByRow(sudokuGrid)
     isValid, tmpGrid := putValue(1, sudokuGrid, nextX, nextY)
     if isValid {
       return isValid, tmpGrid
@@ -54,9 +62,22 @@ func putValue(value int, sudokuGrid SudokuGrid, x int, y int) (bool, SudokuGrid)
 
 
 
-func nextEmptyIndex(sudokuGrid SudokuGrid) (int, int) {
+func nextEmptyIndexByColumn(sudokuGrid SudokuGrid) (int, int) {
   for idxX := 0; idxX < 9; idxX++ {
     for idxY := 0; idxY < 9; idxY++ {
+      if sudokuGrid.grid[idxX][idxY] == 0 {
+        return idxX, idxY
+      }
+    }
+  }
+
+  // There is no more empty index
+  return -1, -1
+}
+
+func nextEmptyIndexByRow(sudokuGrid SudokuGrid) (int, int) {
+  for idxY := 0; idxY < 9; idxY++ {
+    for idxX := 0; idxX < 9; idxX++ {
       if sudokuGrid.grid[idxX][idxY] == 0 {
         return idxX, idxY
       }
