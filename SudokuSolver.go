@@ -45,6 +45,9 @@ func putValue(value int, sudokuGrid SudokuGrid, x int, y int) (bool, SudokuGrid)
   }
 
   sudokuGrid.grid[x][y] = value
+
+  displayGrid(sudokuGrid)
+
   if isGridValid(sudokuGrid) {
     nextX, nextY := nextEmptyIndex(sudokuGrid)
     return putValue(1, sudokuGrid, nextX, nextY)
@@ -148,6 +151,7 @@ func isSubGridValid(subGrid [9]int) bool {
       if cptValue[subGrid[i] - 1] > 1 {
         return false
       }
+
     }
   }
 
@@ -162,13 +166,14 @@ func isSquareValid(sudokuGrid SudokuGrid, x int, y int) bool {
   subGrid := [9]int{}
   idx := 0
 
-  for idxY := y * 3; idxY < y + 3; idxY++ {
-    for idxX := x * 3; idxX < x + 3; idxX++ {
+  for idxY := y * 3; idxY < y * 3 + 3; idxY++ {
+    for idxX := x * 3; idxX < x * 3 + 3; idxX++ {
       subGrid[idx] = sudokuGrid.grid[idxX][idxY]
       idx++
     }
   }
 
+  fmt.Println(isSubGridValid(subGrid), subGrid)
   return isSubGridValid(subGrid)
 }
 
