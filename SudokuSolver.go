@@ -10,16 +10,11 @@ type SudokuGrid struct {
 }
 
 func main() {
-  easy := [9][9]int{[9]int{0, 0, 4, 0, 9, 0, 8, 0, 0}, [9]int{7, 0, 9, 1, 0, 0, 0, 0, 0}, [9]int{1, 0, 0, 0, 2, 0, 5, 0, 7}, [9]int{0, 3, 0, 9, 0, 0, 0, 6, 0}, [9]int{9, 0, 0, 0, 0, 0, 0, 0, 4}, [9]int{0, 6, 0, 0, 0, 8, 0, 7, 0}, [9]int{8, 0, 7, 0, 6, 0, 0, 0, 3}, [9]int{0, 0, 0, 0, 0, 2, 7, 0, 5}, [9]int{0, 0, 5, 0, 3, 0, 6, 0, 0}}
+  //easy := [9][9]int{[9]int{0, 0, 4, 0, 9, 0, 8, 0, 0}, [9]int{7, 0, 9, 1, 0, 0, 0, 0, 0}, [9]int{1, 0, 0, 0, 2, 0, 5, 0, 7}, [9]int{0, 3, 0, 9, 0, 0, 0, 6, 0}, [9]int{9, 0, 0, 0, 0, 0, 0, 0, 4}, [9]int{0, 6, 0, 0, 0, 8, 0, 7, 0}, [9]int{8, 0, 7, 0, 6, 0, 0, 0, 3}, [9]int{0, 0, 0, 0, 0, 2, 7, 0, 5}, [9]int{0, 0, 5, 0, 3, 0, 6, 0, 0}}
 
-  grid := SudokuGrid{grid: easy}
+  hard := [9][9]int{[9]int{0, 7, 0, 0, 5, 0, 0, 8, 0}, [9]int{0, 8, 0, 0, 0, 4, 0, 0, 0}, [9]int{0, 9, 0, 7, 8, 0, 3, 0, 0}, [9]int{8, 0, 0, 0, 7, 0, 2, 0, 0}, [9]int{0, 1, 0, 0, 0, 0, 0, 7, 0}, [9]int{0, 0, 6, 0, 9, 0, 0, 0, 1}, [9]int{0, 0, 1, 0, 3, 2, 0, 4, 0}, [9]int{0, 0, 0, 5, 0, 0, 0, 3, 0}, [9]int{0, 6, 0, 0, 4, 0, 0, 9, 0}}
+  grid := SudokuGrid{grid: hard}
   displayGrid(grid)
-
-  fmt.Println(isSquareValid(grid, 0, 0))
-  fmt.Println(isRowValid(grid, 4))
-  fmt.Println(isColumnValid(grid, 2))
-  fmt.Println(isGridValid(grid))
-  fmt.Println(isSudokuFinished(grid))
 
   isResolved, resolvedGrid := resolveSudoku(grid)
   fmt.Println("Is resolved:", isResolved)
@@ -46,14 +41,15 @@ func putValue(value int, sudokuGrid SudokuGrid, x int, y int) (bool, SudokuGrid)
 
   sudokuGrid.grid[x][y] = value
 
-  displayGrid(sudokuGrid)
-
   if isGridValid(sudokuGrid) {
     nextX, nextY := nextEmptyIndex(sudokuGrid)
-    return putValue(1, sudokuGrid, nextX, nextY)
-  } else {
-    return putValue(value + 1, sudokuGrid, x, y)
+    isValid, tmpGrid := putValue(1, sudokuGrid, nextX, nextY)
+    if isValid {
+      return isValid, tmpGrid
+    }
   }
+  return putValue(value + 1, sudokuGrid, x, y)
+
 }
 
 
@@ -173,7 +169,6 @@ func isSquareValid(sudokuGrid SudokuGrid, x int, y int) bool {
     }
   }
 
-  fmt.Println(isSubGridValid(subGrid), subGrid)
   return isSubGridValid(subGrid)
 }
 
