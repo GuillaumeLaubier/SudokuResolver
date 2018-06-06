@@ -19,26 +19,45 @@ func main() {
 
   start := time.Now()
 
-  isResolved, resolvedGrid := resolveSudoku(grid)
+  isResolved, resolvedGrid := resolveSudoku(grid, nextEmptyIndexByColumn)
 
   elapsed := time.Since(start)
 
-  fmt.Println("Is resolved:", isResolved)
+  fmt.Println("By column:\nIs resolved:", isResolved)
+  fmt.Printf("Took %s\n", elapsed)
+
+  start = time.Now()
+
+  isResolved, resolvedGrid = resolveSudoku(grid, nextEmptyIndexByRow)
+
+  elapsed = time.Since(start)
+
+  fmt.Println("By row:\nIs resolved:", isResolved)
+  fmt.Printf("Took %s\n", elapsed)
+
+  start = time.Now()
+
+  isResolved, resolvedGrid = resolveSudoku(grid, nextEmptyIndexBySquare)
+
+  elapsed = time.Since(start)
+
+  fmt.Println("By square:\nIs resolved:", isResolved)
   fmt.Printf("Took %s\n", elapsed)
 
   displayGrid(resolvedGrid)
+
 }
 
 /*
  * Resolve section
  */
 
-func resolveSudoku(sudokuGrid SudokuGrid) (bool, SudokuGrid) {
-  x, y := nextEmptyIndexByRow(sudokuGrid)
-  return putValue(1, sudokuGrid, x, y)
+func resolveSudoku(sudokuGrid SudokuGrid, nextEmptyIndex func(sudokuGrid SudokuGrid) (int, int)) (bool, SudokuGrid) {
+  x, y := nextEmptyIndex(sudokuGrid)
+  return putValue(1, sudokuGrid, x, y, nextEmptyIndex)
 }
 
-func putValue(value int, sudokuGrid SudokuGrid, x int, y int) (bool, SudokuGrid) {
+func putValue(value int, sudokuGrid SudokuGrid, x int, y int, nextEmptyIndex func(sudokuGrid SudokuGrid) (int, int)) (bool, SudokuGrid) {
   if value > 9 {
     return false, sudokuGrid
   }
@@ -50,13 +69,13 @@ func putValue(value int, sudokuGrid SudokuGrid, x int, y int) (bool, SudokuGrid)
   sudokuGrid.grid[x][y] = value
 
   if isGridValid(sudokuGrid) {
-    nextX, nextY := nextEmptyIndexByRow(sudokuGrid)
-    isValid, tmpGrid := putValue(1, sudokuGrid, nextX, nextY)
+    nextX, nextY := nextEmptyIndex(sudokuGrid)
+    isValid, tmpGrid := putValue(1, sudokuGrid, nextX, nextY, nextEmptyIndex)
     if isValid {
       return isValid, tmpGrid
     }
   }
-  return putValue(value + 1, sudokuGrid, x, y)
+  return putValue(value + 1, sudokuGrid, x, y, nextEmptyIndex)
 
 }
 
@@ -81,6 +100,27 @@ func nextEmptyIndexByRow(sudokuGrid SudokuGrid) (int, int) {
       if sudokuGrid.grid[idxX][idxY] == 0 {
         return idxX, idxY
       }
+    }
+  }
+
+  // There is no more empty index
+  return -1, -1
+}
+
+func nextEmptyIndexBySquare(sudokuGrid SudokuGrid) (int, int) {
+  // parcour all squareq origins
+  for squareY := 0; squareY < 9; squareY += 3 {
+    for squareX := 0; squareX < 9; squareX += 3 {
+
+      // parcour all square cases
+      for idxY := squareY; idxY < squareY + 3; idxY++ {
+        for idxX := squareX; idxX < squareX + 3; idxX++ {
+          if sudokuGrid.grid[idxX][idxY] == 0 {
+            return idxX, idxY
+          }
+        }
+      }
+
     }
   }
 
