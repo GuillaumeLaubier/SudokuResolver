@@ -47,6 +47,16 @@ func main() {
   fmt.Printf("Took %s\n", elapsed)
   fmt.Println("Cpt backtracking:", backTrackingCpt)
 
+  start = time.Now()
+
+  isResolved, resolvedGrid, backTrackingCpt = resolveSudoku(grid, nextEmptyIndexByLessEmptyColumn)
+
+  elapsed = time.Since(start)
+
+  fmt.Println("By square:\nIs resolved:", isResolved)
+  fmt.Printf("Took %s\n", elapsed)
+  fmt.Println("Cpt backtracking:", backTrackingCpt)
+
   displayGrid(resolvedGrid)
 
 }
@@ -84,6 +94,10 @@ func putValue(value int, sudokuGrid SudokuGrid, x int, y int, nextEmptyIndex fun
   }
   return putValue(value + 1, sudokuGrid, x, y, nextEmptyIndex, currentBackTrackingCpt)
 }
+
+/*
+ * Empty index finder (not optimized)
+ */
 
 func nextEmptyIndexByColumn(sudokuGrid SudokuGrid) (int, int) {
   for idxX := 0; idxX < 9; idxX++ {
@@ -130,6 +144,48 @@ func nextEmptyIndexBySquare(sudokuGrid SudokuGrid) (int, int) {
 
   // There is no more empty index
   return -1, -1
+}
+
+/*
+ * empty index finder, preference for less empty
+ */
+
+func nbEmptyIndexInColumn(sudokuGrid SudokuGrid, columnIndex int) int {
+  cpt := 0
+
+  for i := 0; i < 9; i++ {
+    if sudokuGrid.grid[columnIndex][i] == 0 {
+      cpt++
+    }
+  }
+
+  return cpt
+}
+
+func nextEmptyIndexByLessEmptyColumn(sudokuGrid SudokuGrid) (int, int) {
+  fmt.Println("hey")
+
+  // start with the max value for this cpt
+  lessEmptyCpt := 9
+
+  indexX := -1
+  indexY := -1
+
+  for idxY := 0; idxY < 9; idxY++ {
+    emptyCpt := nbEmptyIndexInColumn(sudokuGrid, idxY)
+    if emptyCpt < lessEmptyCpt && emptyCpt != 0 {
+      lessEmptyCpt = emptyCpt
+      indexY = idxY
+      indexX = 0
+      for indexX < 9 && sudokuGrid.grid[indexX][indexY] != 0 {
+        indexX++
+      }
+    }
+  }
+
+  // there is no more empty index
+  fmt.Println(indexX, indexY)
+  return indexX, indexY
 }
 
 /*
