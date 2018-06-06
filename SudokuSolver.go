@@ -19,30 +19,33 @@ func main() {
 
   start := time.Now()
 
-  isResolved, resolvedGrid := resolveSudoku(grid, nextEmptyIndexByColumn)
+  isResolved, resolvedGrid, backTrackingCpt := resolveSudoku(grid, nextEmptyIndexByColumn)
 
   elapsed := time.Since(start)
 
   fmt.Println("By column:\nIs resolved:", isResolved)
   fmt.Printf("Took %s\n", elapsed)
+  fmt.Println("Cpt backtracking:", backTrackingCpt)
 
   start = time.Now()
 
-  isResolved, resolvedGrid = resolveSudoku(grid, nextEmptyIndexByRow)
+  isResolved, resolvedGrid, backTrackingCpt = resolveSudoku(grid, nextEmptyIndexByRow)
 
   elapsed = time.Since(start)
 
   fmt.Println("By row:\nIs resolved:", isResolved)
   fmt.Printf("Took %s\n", elapsed)
+  fmt.Println("Cpt backtracking:", backTrackingCpt)
 
   start = time.Now()
 
-  isResolved, resolvedGrid = resolveSudoku(grid, nextEmptyIndexBySquare)
+  isResolved, resolvedGrid, backTrackingCpt = resolveSudoku(grid, nextEmptyIndexBySquare)
 
   elapsed = time.Since(start)
 
   fmt.Println("By square:\nIs resolved:", isResolved)
   fmt.Printf("Took %s\n", elapsed)
+  fmt.Println("Cpt backtracking:", backTrackingCpt)
 
   displayGrid(resolvedGrid)
 
@@ -52,13 +55,17 @@ func main() {
  * Resolve section
  */
 
-func resolveSudoku(sudokuGrid SudokuGrid, nextEmptyIndex func(sudokuGrid SudokuGrid) (int, int)) (bool, SudokuGrid) {
+func resolveSudoku(sudokuGrid SudokuGrid, nextEmptyIndex func(sudokuGrid SudokuGrid) (int, int)) (bool, SudokuGrid, int) {
   x, y := nextEmptyIndex(sudokuGrid)
-  return putValue(1, sudokuGrid, x, y, nextEmptyIndex)
+  backTrackingCpt := 0
+
+  isResolved, grid := putValue(1, sudokuGrid, x, y, nextEmptyIndex, &backTrackingCpt)
+  return isResolved, grid, backTrackingCpt
 }
 
-func putValue(value int, sudokuGrid SudokuGrid, x int, y int, nextEmptyIndex func(sudokuGrid SudokuGrid) (int, int)) (bool, SudokuGrid) {
+func putValue(value int, sudokuGrid SudokuGrid, x int, y int, nextEmptyIndex func(sudokuGrid SudokuGrid) (int, int), currentBackTrackingCpt *int) (bool, SudokuGrid) {
   if value > 9 {
+    *currentBackTrackingCpt++
     return false, sudokuGrid
   }
 
@@ -70,16 +77,13 @@ func putValue(value int, sudokuGrid SudokuGrid, x int, y int, nextEmptyIndex fun
 
   if isGridValid(sudokuGrid) {
     nextX, nextY := nextEmptyIndex(sudokuGrid)
-    isValid, tmpGrid := putValue(1, sudokuGrid, nextX, nextY, nextEmptyIndex)
+    isValid, tmpGrid := putValue(1, sudokuGrid, nextX, nextY, nextEmptyIndex, currentBackTrackingCpt)
     if isValid {
       return isValid, tmpGrid
     }
   }
-  return putValue(value + 1, sudokuGrid, x, y, nextEmptyIndex)
-
+  return putValue(value + 1, sudokuGrid, x, y, nextEmptyIndex, currentBackTrackingCpt)
 }
-
-
 
 func nextEmptyIndexByColumn(sudokuGrid SudokuGrid) (int, int) {
   for idxX := 0; idxX < 9; idxX++ {
@@ -108,7 +112,7 @@ func nextEmptyIndexByRow(sudokuGrid SudokuGrid) (int, int) {
 }
 
 func nextEmptyIndexBySquare(sudokuGrid SudokuGrid) (int, int) {
-  // parcour all squareq origins
+  // parcour all squares origins
   for squareY := 0; squareY < 9; squareY += 3 {
     for squareX := 0; squareX < 9; squareX += 3 {
 
