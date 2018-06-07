@@ -33,7 +33,7 @@ func main() {
 
   elapsed = time.Since(start)
 
-  fmt.Println("By row:\nIs resolved:", isResolved)
+  fmt.Println("\nBy row:\nIs resolved:", isResolved)
   fmt.Printf("Took %s\n", elapsed)
   fmt.Println("Cpt backtracking:", backTrackingCpt)
 
@@ -43,7 +43,7 @@ func main() {
 
   elapsed = time.Since(start)
 
-  fmt.Println("By square:\nIs resolved:", isResolved)
+  fmt.Println("\nBy square:\nIs resolved:", isResolved)
   fmt.Printf("Took %s\n", elapsed)
   fmt.Println("Cpt backtracking:", backTrackingCpt)
 
@@ -53,7 +53,27 @@ func main() {
 
   elapsed = time.Since(start)
 
-  fmt.Println("By square:\nIs resolved:", isResolved)
+  fmt.Println("\nBy less empty column:\nIs resolved:", isResolved)
+  fmt.Printf("Took %s\n", elapsed)
+  fmt.Println("Cpt backtracking:", backTrackingCpt)
+
+  start = time.Now()
+
+  isResolved, resolvedGrid, backTrackingCpt = resolveSudoku(grid, nextEmptyIndexByLessEmptyRow)
+
+  elapsed = time.Since(start)
+
+  fmt.Println("\nBy less empty row:\nIs resolved:", isResolved)
+  fmt.Printf("Took %s\n", elapsed)
+  fmt.Println("Cpt backtracking:", backTrackingCpt)
+
+  start = time.Now()
+
+  isResolved, resolvedGrid, backTrackingCpt = resolveSudoku(grid, nextEmptyIndexByLessEmptySquare)
+
+  elapsed = time.Since(start)
+
+  fmt.Println("\nBy less empty square:\nIs resolved:", isResolved)
   fmt.Printf("Took %s\n", elapsed)
   fmt.Println("Cpt backtracking:", backTrackingCpt)
 
@@ -163,8 +183,40 @@ func nbEmptyIndexInColumn(sudokuGrid SudokuGrid, columnIndex int) int {
 }
 
 func nextEmptyIndexByLessEmptyColumn(sudokuGrid SudokuGrid) (int, int) {
-  fmt.Println("hey")
+  // start with the max value for this cpt
+  lessEmptyCpt := 9
 
+  indexX := -1
+  indexY := -1
+
+  for idxX := 0; idxX < 9; idxX++ {
+    emptyCpt := nbEmptyIndexInColumn(sudokuGrid, idxX)
+    if emptyCpt < lessEmptyCpt && emptyCpt != 0 {
+      lessEmptyCpt = emptyCpt
+      indexX = idxX
+      indexY = 0
+      for indexY < 9 && sudokuGrid.grid[indexX][indexY] != 0 {
+        indexY++
+      }
+    }
+  }
+
+  return indexX, indexY
+}
+
+func nbEmptyIndexInRow(sudokuGrid SudokuGrid, rowIndex int) int {
+  cpt := 0
+
+  for i := 0; i < 9; i++ {
+    if sudokuGrid.grid[i][rowIndex] == 0 {
+      cpt++
+    }
+  }
+
+  return cpt
+}
+
+func nextEmptyIndexByLessEmptyRow(sudokuGrid SudokuGrid) (int, int) {
   // start with the max value for this cpt
   lessEmptyCpt := 9
 
@@ -172,19 +224,69 @@ func nextEmptyIndexByLessEmptyColumn(sudokuGrid SudokuGrid) (int, int) {
   indexY := -1
 
   for idxY := 0; idxY < 9; idxY++ {
-    emptyCpt := nbEmptyIndexInColumn(sudokuGrid, idxY)
-    if emptyCpt < lessEmptyCpt && emptyCpt != 0 {
+    emptyCpt := nbEmptyIndexInRow(sudokuGrid, idxY)
+    if (emptyCpt < lessEmptyCpt && emptyCpt != 0) {
       lessEmptyCpt = emptyCpt
-      indexY = idxY
       indexX = 0
+      indexY = idxY
       for indexX < 9 && sudokuGrid.grid[indexX][indexY] != 0 {
         indexX++
       }
     }
   }
 
-  // there is no more empty index
-  fmt.Println(indexX, indexY)
+  return indexX, indexY
+}
+
+func nbEmptyIndexInSquare(sudokuGrid SudokuGrid, squareX int, squareY int) int {
+  cpt := 0
+
+  for idxY := squareY; idxY < squareY + 3; idxY++ {
+    for idxX := squareX; idxX < squareX + 3; idxX++ {
+      if sudokuGrid.grid[idxX][idxY] == 0 {
+        cpt++
+      }
+    }
+  }
+
+  return cpt
+}
+
+func nextEmptyIndexByLessEmptySquare(sudokuGrid SudokuGrid) (int, int) {
+  // start with the max value for this cpt
+  lessEmptyCpt := 9
+
+  indexX := -1
+  indexY := -1
+
+  rightSquareX := -1
+  rightSquareY := -1
+
+  // parcour all squares origins
+  for squareY := 0; squareY < 9; squareY += 3 {
+    for squareX := 0; squareX < 9; squareX += 3 {
+
+      emptyCpt := nbEmptyIndexInSquare(sudokuGrid, squareX, squareY)
+
+      if emptyCpt < lessEmptyCpt && emptyCpt != 0 {
+        lessEmptyCpt = emptyCpt
+        rightSquareX = squareX
+        rightSquareY = squareY
+      }
+    }
+  }
+
+  if rightSquareX != -1 {
+    // parcour all square cases
+    for idxY := rightSquareY; idxY < rightSquareY + 3; idxY++ {
+      for idxX := rightSquareX; idxX < rightSquareX + 3; idxX++ {
+        if sudokuGrid.grid[idxX][idxY] == 0 {
+          return idxX, idxY
+        }
+      }
+    }
+  }
+
   return indexX, indexY
 }
 
